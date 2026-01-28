@@ -1,6 +1,6 @@
+import { app } from ".";
 import { PORT } from "../constants";
 import { disconnectDB } from "../lib/prisma";
-import { app } from "./app";
 
 const server = app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

@@ -7,3 +7,33 @@ datasource db {
   provider = "postgresql"
 }
 
+model Department {
+  id          Int          @id @default(autoincrement())
+  code        String       @unique @db.VarChar(50)
+  name        String       @db.VarChar(255)
+  description String?      @db.VarChar(255)
+
+  subjects    Subject[]
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("departments")
+}
+
+model Subject {
+  id              Int          @id @default(autoincrement())
+  departmentId    Int      
+  code            String       @db.VarChar(50)  
+  name            String       @db.VarChar(255)
+  description     String?      @db.VarChar(255)
+
+  department      Department @relation (fields: [departmentId], references: [id], onDelete: Restrict)
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("subjects")
+  @@unique([departmentId, code])
+  @@index([departmentId])
+}
