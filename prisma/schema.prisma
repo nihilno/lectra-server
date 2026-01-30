@@ -27,6 +27,9 @@ model User {
 
   sessions Session[]
   accounts Account[]
+
+  teacherClasses Class[] 
+  studentEnrollments Enrollment[]
 }
 
 model Session {
@@ -100,7 +103,6 @@ model Department {
   @@map("departments")
 }
 
-
 model Subject {
   id              Int          @id @default(autoincrement())
   departmentId    Int      
@@ -136,7 +138,7 @@ model Class {
   updatedAt DateTime @updatedAt
 
   subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
-  // teacher User    @relation(fields: [teacherId], references: [id], onDelete: Restrict)
+  teacher User    @relation(fields: [teacherId], references: [id], onDelete: Restrict)
   enrollments Enrollment[]
 
   @@index([subjectId])
@@ -148,7 +150,7 @@ model Enrollment {
   studentId String
   classId   Int
 
-  // student User  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  student User  @relation(fields: [studentId], references: [id], onDelete: Cascade)
   class   Class @relation(fields: [classId], references: [id], onDelete: Cascade)
 
   @@id([studentId, classId])
@@ -157,3 +159,4 @@ model Enrollment {
   @@index([classId])
   @@map("enrollments")
 }
+
