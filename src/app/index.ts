@@ -5,6 +5,10 @@ import subjectsRouter from "./routes/subjects.js";
 export const app = express();
 
 app.use(express.json());
+
+if (!process.env.FRONTEND_URL) {
+  throw new Error("FRONTEND_URL is not defined in environment variables");
+}
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
@@ -14,7 +18,3 @@ app.use(
 );
 
 app.use("/api", subjectsRouter);
-
-app.get("/", (req, res) => {
-  res.send("Hello, World!");
-});

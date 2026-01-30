@@ -7,19 +7,99 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  student
+  teacher
+  admin
+}
+
+model User {
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  emailVerified Boolean
+  image         String?
+  role          Role     @default(student)
+  imageCldPubId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessions Session[]
+  accounts Account[]
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  expiresAt DateTime
+  token     String   @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ipAddress String?
+  userAgent String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Account {
+  id        String   @id @default(uuid())
+  accountId String
+  providerId String
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  accessToken            String?
+  refreshToken           String?
+  idToken                String?
+  accessTokenExpiresAt   DateTime?
+  refreshTokenExpiresAt  DateTime?
+  scope                  String?
+  password               String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([identifier])
+}
+
+enum ClassStatus {
+  active
+  inactive
+  archived
+}
+
 model Department {
-  id          Int          @id @default(autoincrement())
-  code        String       @unique @db.VarChar(50)
-  name        String       @db.VarChar(255)
-  description String?      @db.VarChar(255)
+  id          Int     @id @default(autoincrement())
+  code        String  @unique @db.VarChar(50)
+  name        String  @db.VarChar(255)
+  description String? @db.VarChar(255)
 
-  subjects    Subject[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  subjects Subject[]
 
   @@map("departments")
 }
+
 
 model Subject {
   id              Int          @id @default(autoincrement())
@@ -29,6 +109,7 @@ model Subject {
   description     String?      @db.VarChar(255)
 
   department      Department @relation (fields: [departmentId], references: [id], onDelete: Restrict)
+   classes    Class[]
 
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
@@ -36,4 +117,43 @@ model Subject {
   @@map("subjects")
   @@unique([departmentId, code])
   @@index([departmentId])
+}
+
+model Class {
+  id            Int         @id @default(autoincrement())
+  subjectId     Int
+  teacherId     String
+  inviteCode    String      @unique
+  name          String      @db.VarChar(255)
+  bannerCldPubId String?
+  bannerUrl     String?
+  description   String?
+  capacity      Int         @default(50)
+  status        ClassStatus @default(active)
+  schedules     Json        @default("[]")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  // teacher User    @relation(fields: [teacherId], references: [id], onDelete: Restrict)
+  enrollments Enrollment[]
+
+  @@index([subjectId])
+  @@index([teacherId])
+  @@map("classes")
+}
+
+model Enrollment {
+  studentId String
+  classId   Int
+
+  // student User  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  class   Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@id([studentId, classId])
+  @@unique([studentId, classId])
+  @@index([studentId])
+  @@index([classId])
+  @@map("enrollments")
 }

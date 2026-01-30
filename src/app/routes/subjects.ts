@@ -6,8 +6,10 @@ const router = express.Router();
 router.get("/subjects", async (req, res) => {
   try {
     const { search, department, page = 1, limit = 10 } = req.query;
-    const currentPage = Math.max(1, +page);
-    const take = Math.max(1, +limit);
+
+    const currentPage = Math.max(1, parseInt(String(page), 10) || 1);
+    const take = Math.min(Math.max(1, parseInt(String(limit), 10) || 10), 100);
+
     const skip = (currentPage - 1) * take;
     const filterConditions: any = {};
 
