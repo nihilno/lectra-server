@@ -48,7 +48,7 @@ async function securityMiddleware(
       },
     };
 
-    const decision = await aj.protect(arcjetRequest);
+    const decision = await client.protect(arcjetRequest);
     if (decision.isDenied() && decision.reason.isBot()) {
       return res.status(403).json({
         error: "Forbidden",
@@ -64,7 +64,7 @@ async function securityMiddleware(
     }
 
     if (decision.isDenied() && decision.reason.isRateLimit()) {
-      return res.status(403).json({
+      return res.status(429).json({
         error: "To many requests.",
         message,
       });

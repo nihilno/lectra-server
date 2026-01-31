@@ -1,7 +1,13 @@
 import arcjet, { detectBot, shield, slidingWindow } from "@arcjet/node";
+import { config } from "dotenv";
+config();
 
-if (!process.env.ARCJET_KEY || process.env.NODE_ENV === "test") {
+if (!process.env.ARCJET_KEY) {
   throw new Error("ARCJET_KEY environment variable is not set");
+}
+
+if (process.env.NODE_ENV === "test") {
+  throw new Error("Arcjet should not be initialized in test mode");
 }
 
 export const aj = arcjet({
@@ -19,8 +25,8 @@ export const aj = arcjet({
     }),
     slidingWindow({
       mode: "LIVE",
-      interval: "2s",
-      max: 5,
+      interval: "10s",
+      max: 50,
     }),
   ],
 });

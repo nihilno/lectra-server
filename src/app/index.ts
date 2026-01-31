@@ -1,5 +1,7 @@
+import { toNodeHandler } from "better-auth/node";
 import cors from "cors";
 import express from "express";
+import { auth } from "../lib/auth.js";
 import { securityMiddleware } from "./middlewares/security.js";
 import subjectsRouter from "./routes/subjects.js";
 
@@ -19,4 +21,6 @@ app.use(
   }),
 );
 
+// Splat matches any route without the root route. It's a catch-all block.
+app.all("/api/auth/{*splat}", toNodeHandler(auth));
 app.use("/api", subjectsRouter);
