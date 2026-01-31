@@ -25,7 +25,7 @@ async function securityMiddleware(
         message = "User rate limit exceeded. (10 per minute)";
         break;
       default:
-        limit = 5;
+        limit = 50;
         message =
           "Guest rate limit exceeded. (5 per minute). Please, sign up for higher limits.";
         break;

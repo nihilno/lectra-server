@@ -3,7 +3,9 @@ import cors from "cors";
 import express from "express";
 import { auth } from "../lib/auth.js";
 import { securityMiddleware } from "./middlewares/security.js";
+import classesRouter from "./routes/classes.js";
 import subjectsRouter from "./routes/subjects.js";
+import usersRouter from "./routes/users.js";
 
 export const app = express();
 
@@ -24,3 +26,5 @@ app.use(
 // Splat matches any route without the root route. It's a catch-all block.
 app.all("/api/auth/{*splat}", toNodeHandler(auth));
 app.use("/api", subjectsRouter);
+app.use("/api", usersRouter);
+app.use("/api", classesRouter);
